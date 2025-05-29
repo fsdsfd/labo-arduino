@@ -9,28 +9,26 @@ void setup()
   lcd_1.begin(16, 2);
   lcd_1.print("Puntos");
   pinMode(13,INPUT);
-  Serial.print("Se inicio");
+  Serial.println("Se inicio");
 
 }
   int acc =0;
-  unsigned long seg = 0;
+  unsigned long seg = millis();
 void loop()
-{
-  seg= millis();
-	
+{	
    int boton= digitalRead(13);
-  if(boton){
-  acc++;
-  Serial.println(acc);
 
-  }else{
-  }
-  if(seg >= 500){
+  if(millis()-seg >= 200){
    lcd_1.setCursor(0, 1);
   lcd_1.print(acc);
   lcd_1.setBacklight(1);
   lcd_1.setBacklight(0); 
-  seg=0;
+  if(boton){
+  acc++;
 
+  Serial.println(acc);
+
+  }
+    seg=millis();
   }
 }
