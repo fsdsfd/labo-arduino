@@ -1,0 +1,15 @@
+SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
+
+
+- Que el led prenda al apretar un botón
+- Que el LCD cuente las pulsasiones del botón
+- Juntar el led con el LCD
+- Algo que indique que el boton debe ser pulsado
+- Contar ese punto dentro del tiempo indicado 
+- Que el led se prenda si es prendido dentro del tiempo indicado, sino, no prenderse o no contar el punto
+- Que guarde el puntaje  y muestre en pantalla o al final del juego o durante el juego
+- Que se cumpla todo lo anterior pero para dos botones
+- Indicar que boton se debe de pulsar de los dos de manera aleatoria, que se cumpla las condiciones anteriores
+- Hacer lo mismo para 5 leds, tres botones
+
+
