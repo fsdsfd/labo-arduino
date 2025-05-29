@@ -25,12 +25,12 @@ void loop()
 
   }else{
   }
-  if(seg >= 200){
+  if(seg >= 500){
    lcd_1.setCursor(0, 1);
   lcd_1.print(acc);
   lcd_1.setBacklight(1);
   lcd_1.setBacklight(0); 
-  }
-  
+  seg=0;
 
+  }
 }
