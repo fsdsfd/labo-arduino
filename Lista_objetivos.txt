@@ -1,15 +1,34 @@
 SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 
-
+Parte 1
 - Que el led prenda al apretar un botón
 - Que el LCD cuente las pulsasiones del botón
 - Juntar el led con el LCD
-- Algo que indique que el boton debe ser pulsado
-- Contar ese punto dentro del tiempo indicado 
-- Que el led se prenda si es prendido dentro del tiempo indicado, sino, no prenderse o no contar el punto
-- Que guarde el puntaje  y muestre en pantalla o al final del juego o durante el juego
-- Que se cumpla todo lo anterior pero para dos botones
-- Indicar que boton se debe de pulsar de los dos de manera aleatoria, que se cumpla las condiciones anteriores
-- Hacer lo mismo para 5 leds, tres botones
+- Contar esa pulsasión dentro de un tiempo indicado (Por ahora, un tiempo fijo)
+- Que no contabilice el estar manteniendo presionado el boton
+- Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que el tiempo aumente de velocidad
+- Llevar el modelo hecho al protoboard simulado
+
+
+Parte 2
+- Algo que indique que el led de 'x' color debe ser prendido
+- Algo que indique de manera aleatoria que color de led debe ser prendido (Trabajo únicamente sobre un botón y un led, solo para identificar como tendría que ser el
+código caso hipotético que estén los colores)
+- Contabilizar el haber prendido el led
+- Que no contabilice el estar manteniendo presioando el boton
+- Llevar el modelo hecho al protoboard simulado
+
+Parte 3
+- Juntar que contabilice el haber prendido el led DENTRO de un tiempo indicado y que pasasdo cierto tiempo aumente la velocidad
+- Optmizar códigio
+- Llevar el modelo hecho al protoboard simulado
+
+Parte 4
+- Añadir otro led junto con su boton y adaptar el código para que funcione para dos led
+- protoboard
+
+Ultima Parte
+- Añadir los leds y barreras restantes y adaptar el código 
+- Fin
 
 
