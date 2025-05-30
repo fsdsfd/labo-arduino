@@ -1,34 +1,40 @@
 SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 
-Parte 1
+* Parte 1 [PULSADOR, CONTEO Y TEMPORIZADOR]
 - Que el led prenda al apretar un botón
 - Que el LCD cuente las pulsasiones del botón
 - Juntar el led con el LCD
-- Contar esa pulsasión dentro de un tiempo indicado (Por ahora, un tiempo fijo)
-- Que no contabilice el estar manteniendo presionado el boton
-- Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que el tiempo aumente de velocidad
-- Llevar el modelo hecho al protoboard simulado
+- Contar la pulsasión dentro de un tiempo indicado (Por ahora, un tiempo fijo)
+- Que no contabilice el mantener presionado el botón
+- Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que aumente la velocidad de juego
+reduciendo el tiempo de reacción
+- Que al finaliar el tiempo de juego, se acabe la ejecución y muestre el puntaje obtenido
+- Adaptar el modelo creado al protoboard de Tinkercad
+- Probar en la vida real
 
-
-Parte 2
+* Parte 2 [COLOR Y CONTEO]
 - Algo que indique que el led de 'x' color debe ser prendido
-- Algo que indique de manera aleatoria que color de led debe ser prendido (Trabajo únicamente sobre un botón y un led, solo para identificar como tendría que ser el
-código caso hipotético que estén los colores)
+- Algo que indique de manera aleatoria que color de led debe ser prendido (trabajo inicial solo con un botón y un led, para entender la lógica hipotética en caso de tener múltiples colores)
 - Contabilizar el haber prendido el led
 - Que no contabilice el estar manteniendo presioando el boton
-- Llevar el modelo hecho al protoboard simulado
+- Adaptar el modelo creado al protoboard de Tinkercad
+- Probar en la vida real
 
-Parte 3
+* Parte 3 [COMBINACION DE LAS PARTES ANTERIORES]
 - Juntar que contabilice el haber prendido el led DENTRO de un tiempo indicado y que pasasdo cierto tiempo aumente la velocidad
-- Optmizar códigio
-- Llevar el modelo hecho al protoboard simulado
+- Optmizar código
+- Adaptar el modelo creado al protoboard de Tinkercad
+- Probar en la vida real
 
-Parte 4
-- Añadir otro led junto con su boton y adaptar el código para que funcione para dos led
+* Parte 4 [INCLUSION DE OTRO LED]
+- Añadir otro led junto con su boton y adaptar el código para ambos funcionen bien
 - protoboard
+- vida real
 
-Ultima Parte
-- Añadir los leds y barreras restantes y adaptar el código 
+* Última Parte [INCLUSION DE LAS PARTES FINALES]
+- Añadir los leds, barreras restantes y adaptar el código 
+- protoboard
+- vida real
 - Fin
 
 
