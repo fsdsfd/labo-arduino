@@ -1,40 +1,40 @@
 SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 
-* Parte 1 [PULSADOR, CONTEO Y TEMPORIZADOR]
-- Que el led prenda al apretar un botón
-- Que el LCD cuente las pulsasiones del botón
-- Juntar el led con el LCD
-- Contar la pulsasión dentro de un tiempo indicado (Por ahora, un tiempo fijo)
-- Que no contabilice el mantener presionado el botón
-- Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que aumente la velocidad de juego
-reduciendo el tiempo de reacción
-- Que al finaliar el tiempo de juego, se acabe la ejecución y muestre el puntaje obtenido
+* Parte 1 (PULSADOR, CONTEO Y TEMPORIZADOR)
+- Led prenda al apretar un botón [Listo]
+- LCD cuente las pulsaciones del botón [Listo]
+- Juntar el led con el LCD [Listo]
+- Contar la pulsación dentro de un tiempo indicado (Por ahora, un tiempo fijo) [Listo]
+- Que no contabilice el mantener presionado el botón [Listo]
+- Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que aumente la velocidad de juego reduciendo el tiempo de reacción [Listo]
+- Tiempo de la ronda y número de la ronda mostrado en el LCD [Listo]
+- Al finalizar cada ronda, el LCD muestre “PAUSA” o similar
+- Que, al finalizar el tiempo de juego, se acabe la ejecución y muestre tanto el puntaje obtenido y una palabra que indique que terminó el juego
 - Adaptar el modelo creado al protoboard de Tinkercad
 - Probar en la vida real
 
-* Parte 2 [COLOR Y CONTEO]
+* Parte 2 (COLOR Y CONTEO)
 - Algo que indique que el led de 'x' color debe ser prendido
 - Algo que indique de manera aleatoria que color de led debe ser prendido (trabajo inicial solo con un botón y un led, para entender la lógica hipotética en caso de tener múltiples colores)
 - Contabilizar el haber prendido el led
-- Que no contabilice el estar manteniendo presioando el boton
+- Que no contabilice el estar manteniendo presionando el botón
+- Si el jugador presionó el botón, que ya no cuente más puntos hasta que el LCD le indique que otro color debe pulsar
 - Adaptar el modelo creado al protoboard de Tinkercad
 - Probar en la vida real
 
-* Parte 3 [COMBINACION DE LAS PARTES ANTERIORES]
-- Juntar que contabilice el haber prendido el led DENTRO de un tiempo indicado y que pasasdo cierto tiempo aumente la velocidad
-- Optmizar código
+* Parte 3 (COMBINACION DE LAS PARTES ANTERIORES)
+- Juntar la 'parte 1' con la 'parte 2' y que sean compatibles entre si
+- Optimizar código
 - Adaptar el modelo creado al protoboard de Tinkercad
 - Probar en la vida real
 
-* Parte 4 [INCLUSION DE OTRO LED]
-- Añadir otro led junto con su boton y adaptar el código para ambos funcionen bien
+* Parte 4 (INCLUSION DE OTRO LED)
+- Añadir otro led junto con su botón y adaptar el código para que ambos funcionen bien
 - protoboard
 - vida real
 
-* Última Parte [INCLUSION DE LAS PARTES FINALES]
-- Añadir los leds, barreras restantes y adaptar el código 
+* Última Parte (INCLUSION DE LAS PARTES FINALES)
+- Añadir los leds, barreras restantes y adaptar el código
 - protoboard
 - vida real
 - Fin
-
-
