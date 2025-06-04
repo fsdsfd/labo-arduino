@@ -8,10 +8,10 @@ SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 - Que no contabilice el mantener presionado el botón [Listo]
 - Pasado cierto tiempo o cierta cantidad de pulsaciones contadas, que aumente la velocidad de juego reduciendo el tiempo de reacción [Listo]
 - Tiempo de la ronda y número de la ronda mostrado en el LCD [Listo]
-- Al finalizar cada ronda, el LCD muestre “PAUSA” o similar
-- Que, al finalizar el tiempo de juego, se acabe la ejecución y muestre tanto el puntaje obtenido y una palabra que indique que terminó el juego
-- Adaptar el modelo creado al protoboard de Tinkercad
-- Probar en la vida real
+- Al finalizar cada ronda, el LCD muestre “PAUSA” o similar [Listo]
+- Que, al finalizar el tiempo de juego, se acabe la ejecución y muestre tanto el puntaje obtenido y una palabra que indique que terminó el juego [Listo]
+- Adaptar el modelo creado al protoboard de Tinkercad [Listo]
+- Probar en la vida real [Listo]
 
 * Parte 2 (COLOR Y CONTEO)
 - Algo que indique que el led de 'x' color debe ser prendido
