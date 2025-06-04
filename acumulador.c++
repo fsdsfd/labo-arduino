@@ -1,4 +1,4 @@
-// C++ code
+
 
 //Bibliotecas
 #include <Adafruit_LiquidCrystal.h>
@@ -9,6 +9,7 @@ int apagado = 1;
 int contador = 0;
 int ultimoConteo = -1;
 int ultimoTiempo = -1;
+int tiempoFinal = 0;
 unsigned long tiempo = 0;
 unsigned long tiempoPrendido = 0;
 
@@ -17,6 +18,16 @@ Adafruit_LiquidCrystal lcd_1(0x20); //Dirección LCD
 
 //--------------------------------------------Propias funciones--------------------------------------------
 
+void limpiezatot(){
+  lcd_1.setCursor(0, 0);  //lcd_1.setCursor(columna , fila)
+  lcd_1.print("                            ");
+  lcd_1.setCursor(0, 1);  //lcd_1.setCursor(columna , fila)
+  lcd_1.print("                     ");
+}
+void limpiezainf(){
+  lcd_1.setCursor(0, 1);  //lcd_1.setCursor(columna , fila)
+  lcd_1.print("                     ");
+}
 //Función en donde se puede manejar la velocidad con la que la persona tendrá que reaccionar
 void Velocidad_reaccion(int pin, int tiempo_espera, int tiempo_reaccion) {
   //Tiempo en el que no dará voltaje el pin
@@ -53,7 +64,29 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
     lcd_1.print(duracion_ronda - tiempo_transcurrido);
     ultimoTiempo = tiempo_transcurrido;
   }
+  if(duracion_ronda - tiempo_transcurrido == tiempoFinal){
+        lcd_1.setCursor(0, 0);
+    lcd_1.print("FIN DE RONDA     ");
+	limpiezainf();
+      limpiezatot();
 
+    if(duracion_ronda - tiempo_transcurrido <=tiempoFinal - 1000){
+    lcd_1.setCursor(14, 0);
+    lcd_1.print(ronda);
+    lcd_1.setCursor(11, 1);
+    lcd_1.print(duracion_ronda - tiempo_transcurrido);	
+
+      limpiezatot();
+	  //lcd_1.backlight();
+    }
+  }
+      lcd_1.setCursor(0, 0);  //lcd_1.setCursor(columna , fila)
+
+  lcd_1.print("Contador");
+  lcd_1.setCursor(9, 0);  //lcd_1.setCursor(columna , fila)
+  lcd_1.print("Ronda");
+       lcd_1.setCursor(3, 1);
+    lcd_1.print(contador);
 }  //Fin de la función
 
 
@@ -75,7 +108,6 @@ void setup() {
   lcd_1.setCursor(9, 0);  //lcd_1.setCursor(columna , fila)
   lcd_1.print("Ronda");
 }
-
 
 
 void loop() {
@@ -126,5 +158,18 @@ void loop() {
       }
     }
   }  // Fin de todo el condicional
+  if(millis()>=17000){
+      lcd_1.setCursor(0 , 0);
+    lcd_1.print("FIN     ");
+	  lcd_1.setCursor(9 , 0);
+    lcd_1.print("Puntaje");
+     lcd_1.setCursor(1 , 2);
+    lcd_1.print("       ");
 
+    lcd_1.setCursor(8 , 2);
+    lcd_1.print(contador);
+    lcd_1.setCursor(13 , 2);
+    lcd_1.print("              ");
+
+  }
 }  //Cierre del loop
