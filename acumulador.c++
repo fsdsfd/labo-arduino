@@ -168,7 +168,6 @@ void loop() {
     lcd_1.setCursor(8 , 2);
     lcd_1.print(contador);
     lcd_1.setCursor(13 , 2);
-    lcd_1.print("              ");
 
   }
 }  //Cierre del loop
