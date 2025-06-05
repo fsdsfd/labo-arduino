@@ -1,11 +1,6 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-
-#define trigPin 6 //o cualquiera
-#define echoPin 7 //o cualquiera
-#define ledPin 13 //o cualquiera
-
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+#define trigPin 6
+#define echoPin 7
+#define ledPin 13
 
 long duracion;
 int distancia;
@@ -22,24 +17,17 @@ void setup() {
   Serial.begin(9600);
   randomSeed(analogRead(0));
 
-  lcd.init();          
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("Atrapa al topo");
-  lcd.setCursor(0, 1);
-  lcd.print("Listo para jugar!");
+  Serial.println("Atrapa al topo");
+  Serial.println("Listo para jugar!");
   delay(2000);
-  lcd.clear();
+  Serial.println("------------------");
 }
 
 void loop() {
   if (topoCount >= 3) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Juego terminado!");
-    lcd.setCursor(0, 1);
-    lcd.print("Puntaje: ");
-    lcd.print(puntaje);
+    Serial.println("Juego terminado!");
+    Serial.print("Puntaje final: ");
+    Serial.println(puntaje);
     while (true); // Termina el juego
   }
 
@@ -50,9 +38,7 @@ void loop() {
     ledOn = true;
     ledStartTime = millis();
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Topo aparecio!");
+    Serial.println("¡Topo apareció!");
   }
 
   // Medir distancia
@@ -65,18 +51,16 @@ void loop() {
   duracion = pulseIn(echoPin, HIGH);
   distancia = duracion * 0.034 / 2;
 
-  if (ledOn && distance < 10) {
+  if (ledOn && distancia > 0 && distancia < 10) {
     digitalWrite(ledPin, LOW);
     ledOn = false;
     puntaje += 2;
     topoCount++;
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("¡Le diste!");
-    lcd.setCursor(0, 1);
-    lcd.print("Puntaje: ");
-    lcd.print(puntaje);
+    Serial.println("¡Le diste!");
+    Serial.print("Puntaje: ");
+    Serial.println(puntaje);
+    Serial.println("------------------");
     delay(1000);
   }
 
@@ -85,12 +69,10 @@ void loop() {
     ledOn = false;
     topoCount++;
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Se escapo :(");
-    lcd.setCursor(0, 1);
-    lcd.print("Puntaje: ");
-    lcd.print(puntaje);
+    Serial.println("Se escapó :(");
+    Serial.print("Puntaje: ");
+    Serial.println(puntaje);
+    Serial.println("------------------");
     delay(1000);
   }
 }
