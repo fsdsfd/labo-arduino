@@ -1,9 +1,7 @@
-
-
 //Bibliotecas
-#include <Adafruit_LiquidCrystal.h>
-//#include <LiquidCrystal_I2C.h>
-#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal_I2C.h>  // PCF8574
+
+
 //Variables
 int apagado = 1;
 int contador = 0;
@@ -13,21 +11,25 @@ int tiempoFinal = 0;
 unsigned long tiempo = 0;
 unsigned long tiempoPrendido = 0;
 
-LiquidCrystal_I2C lcd_1(0x27, 16, 2);
+LiquidCrystal_I2C lcd_1(0x27, 16, 2);  //Dirección del LCD [PCF8574]
 
 //--------------------------------------------Propias funciones--------------------------------------------
 
-void limpiezatot(){
+void limpiezatot() {
   lcd_1.setCursor(0, 0);  //lcd_1.setCursor(columna , fila)
   lcd_1.print("                            ");
-  lcd_1.setCursor(0, 1);  //lcd_1.setCursor(columna , fila)
+  lcd_1.setCursor(0, 1);
   lcd_1.print("                     ");
 }
-void limpiezainf(){
-  lcd_1.setCursor(0, 1);  //lcd_1.setCursor(columna , fila)
+
+
+void limpiezainf() {
+  lcd_1.setCursor(0, 1);
   lcd_1.print("                     ");
 }
-//Función en donde se puede manejar la velocidad con la que la persona tendrá que reaccionar
+
+
+//*****Manejar la velocidad con la que la persona tendrá que reaccionar*****
 void Velocidad_reaccion(int pin, int tiempo_espera, int tiempo_reaccion) {
   //Tiempo en el que no dará voltaje el pin
   if (millis() <= tiempo + tiempo_espera) {
@@ -47,15 +49,14 @@ void Velocidad_reaccion(int pin, int tiempo_espera, int tiempo_reaccion) {
 
   }  //Cierre de todo el condicional
 
-}  //Fin de la función
+}  //_____Fin de la función_____
 
 
-//Función para manejar el tiempo de la ronda [EN SEGUNDOS]
+//*****Manejar el tiempo de la ronda [EN SEGUNDOS]*****
 void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
   //'tiempo_inicio_ronda' es desde que tiempo de ejecución la ronda se inició
   int tiempo_transcurrido = (millis() / 1000 - tiempo_inicio_ronda);
 
-  //Evito que el LCD se resetee por actualizarse constantemente
   if (tiempo_transcurrido != ultimoTiempo) {
     lcd_1.setCursor(14, 0);
     lcd_1.print(ronda);
@@ -63,30 +64,31 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
     lcd_1.print(duracion_ronda - tiempo_transcurrido);
     ultimoTiempo = tiempo_transcurrido;
   }
-  if(duracion_ronda - tiempo_transcurrido == tiempoFinal){
-        lcd_1.setCursor(0, 0);
+
+  if (duracion_ronda - tiempo_transcurrido == tiempoFinal) {
+    lcd_1.setCursor(0, 0);
     lcd_1.print("FIN DE RONDA     ");
-	limpiezainf();
-      limpiezatot();
+    limpiezainf();
+    limpiezatot();
 
-    if(duracion_ronda - tiempo_transcurrido <=tiempoFinal - 1000){
-    lcd_1.setCursor(14, 0);
-    lcd_1.print(ronda);
-    lcd_1.setCursor(11, 1);
-    lcd_1.print(duracion_ronda - tiempo_transcurrido);	
+    if (duracion_ronda - tiempo_transcurrido <= tiempoFinal - 1000) {
+      lcd_1.setCursor(14, 0);
+      lcd_1.print(ronda);
+      lcd_1.setCursor(11, 1);
+      lcd_1.print(duracion_ronda - tiempo_transcurrido);
 
       limpiezatot();
-	  //lcd_1.backlight();
+      //lcd_1.backlight();
     }
   }
-      lcd_1.setCursor(0, 0);  //lcd_1.setCursor(columna , fila)
-
+  lcd_1.setCursor(0, 0);
   lcd_1.print("Contador");
-  lcd_1.setCursor(9, 0);  //lcd_1.setCursor(columna , fila)
+  lcd_1.setCursor(9, 0);
   lcd_1.print("Ronda");
-       lcd_1.setCursor(3, 1);
-    lcd_1.print(contador);
-}  //Fin de la función
+  lcd_1.setCursor(3, 1);
+  lcd_1.print(contador);
+
+}  //_____Fin de la función_____
 
 
 //--------------------------------------------Fin de las propias funciones--------------------------------------------
@@ -100,9 +102,8 @@ void setup() {
   tiempo = millis();
   tiempoPrendido = millis();
 
-  lcd_1.begin(16, 2);
-  //lcd_1.init();
-  //lcd_1.backlight();
+  lcd_1.init();       //Inicializar el LCD
+  lcd_1.backlight();  //Prender la pantalla
   lcd_1.print("Contador");
   lcd_1.setCursor(9, 0);  //lcd_1.setCursor(columna , fila)
   lcd_1.print("Ronda");
@@ -110,17 +111,18 @@ void setup() {
 
 
 void loop() {
-  //Evitar reseteo del LCD [BUG corregido]
+  //Imprimir contador en el LCD
   if (contador != ultimoConteo) {
     lcd_1.setCursor(3, 1);
     lcd_1.print(contador);
     ultimoConteo = contador;
   }
 
-  //Tiempo de la ronda y varial la velocidad de reacción
+  //Tiempo de la ronda y variar la velocidad de reacción
   if (millis() < 7000) {
+    //(ronda,duracion_ronda,tiempo_inicio_ronda)
     Tiempo_ronda(1, 6, 0);
-    //Llamada a la función creada
+    //(pin,tiempo_espera,tiempo_reaccion)
     Velocidad_reaccion(12, 1000, 3000);  //Dos segundos de reacción
   } else {
     if (millis() >= 8000 && millis() < 12000) {
@@ -136,7 +138,6 @@ void loop() {
 
   //Si el pin está recibiendo voltaje, dará 1 (prendido) sino, dará 0 (apagado)
   int estado = digitalRead(11);
-
 
 
   //Validación del conteo de puntos
@@ -157,17 +158,19 @@ void loop() {
       }
     }
   }  // Fin de todo el condicional
-  if(millis()>=17000){
-      lcd_1.setCursor(0 , 0);
+
+
+  //Pantalla final
+  if (millis() >= 17000) {
+    lcd_1.setCursor(0, 0);
     lcd_1.print("FIN     ");
-	  lcd_1.setCursor(9 , 0);
+    lcd_1.setCursor(9, 0);
     lcd_1.print("Puntaje");
-     lcd_1.setCursor(1 , 2);
+    lcd_1.setCursor(1, 2);
     lcd_1.print("       ");
 
-    lcd_1.setCursor(8 , 2);
+    lcd_1.setCursor(8, 2);
     lcd_1.print(contador);
-    lcd_1.setCursor(13 , 2);
-
+    lcd_1.setCursor(13, 2);
   }
 }  //Cierre del loop
