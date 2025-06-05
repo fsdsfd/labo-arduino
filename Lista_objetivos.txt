@@ -1,5 +1,6 @@
 SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 
+
 * Parte 1 (PULSADOR, CONTEO Y TEMPORIZADOR)
 - Led prenda al apretar un botón [Listo]
 - LCD cuente las pulsaciones del botón [Listo]
@@ -13,26 +14,22 @@ SUJETO A MODIFICACIONES Y OBJETIVOS DE POR MEDIO
 - Adaptar el modelo creado al protoboard de Tinkercad [Listo]
 - Probar en la vida real [Listo]
 
-* Parte 2 (COLOR Y CONTEO)
-- Contabilizar el haber prendido el led
-- Que no contabilice el estar manteniendo presionando el botón
-- Si el jugador presionó el botón, que ya no cuente más puntos hasta que el LCD le indique que otro color debe pulsar
-- Adaptar el modelo creado al protoboard de Tinkercad
+  
+
+* Parte 2 (LEDS Y PUNTAJE MEJORADO)
+- Colocar dos leds más con sus respectivas conexiones, resistencias y botones
+- Que el programa de manera aleatoria indique que LED debe ser pulsado
+- Si el LED fue pulsado, que solo cuente un punto independiente de si la persona presiona varias veces hasta que el programa indique el próximo LED a prender
+- [EXTRA] Si presiona fuera de tiempo, que quite puntaje
 - Probar en la vida real
+- Mejorar la legibilidad del código
 
-* Parte 3 (COMBINACION DE LAS PARTES ANTERIORES)
-- Juntar la 'parte 1' con la 'parte 2' y que sean compatibles entre si
-- Optimizar código
-- Adaptar el modelo creado al protoboard de Tinkercad
-- Probar en la vida real
 
-* Parte 4 (INCLUSION DE OTRO LED)
-- Añadir otro led junto con su botón y adaptar el código para que ambos funcionen bien
-- protoboard
-- vida real
 
-* Última Parte (INCLUSION DE LAS PARTES FINALES)
-- Añadir los leds, barreras restantes y adaptar el código
-- protoboard
-- vida real
-- Fin
+* Parte 3 (SENSORES DE BARRERA) [Independiente de la parte 1 y 2]
+- Colocar un sensor de barrera con sus respetivas conexiones
+- Al ser activado, que el puntaje cuente por dos
+- Colocarle el 2do sensor y aplicar lo mismo
+- Juntar los sensores con los leds y volverlo compatible con el código
+- Que funcione por favor [En el arduino REAL]
+- FIN
