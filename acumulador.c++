@@ -170,7 +170,7 @@ for (int i = 0; i < 3; i++) {
     apagado = 0;
     tiempoPrendido = millis();
 
-        digitalWrite(leds[i], LOW);
+     digitalWrite(leds[i], LOW);
   } else {
     if (millis() - tiempoPrendido >= 20 && estado == LOW) {
       apagado = 1;
@@ -178,6 +178,9 @@ for (int i = 0; i < 3; i++) {
       if (estado == HIGH) {
         tiempoPrendido = millis();
       }
+    }
+    if (estado == HIGH && ledsActivos[i] == false) {
+     contador--;
     }
   }
 }
