@@ -2,8 +2,8 @@
 #include <LiquidCrystal_I2C.h>  // PCF8574
 
 
- //Variables
- int apagado = 1;
+//Variables
+int apagado = 1;
 int contador = 0;
 int ultimoConteo = -1;
 int ultimoTiempo = -1;
@@ -120,6 +120,8 @@ void setup() {
   tiempo = millis();
   tiempoPrendido = millis();
 
+  randomSeed(analogRead(A0));
+
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
   lcd_1.print("Contador");
@@ -166,7 +168,6 @@ void loop() {
       }
     }
   }
-
 
   //Pantalla final
   if (millis() >= 17000) {
