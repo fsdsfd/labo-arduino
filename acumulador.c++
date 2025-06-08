@@ -1,5 +1,5 @@
 //Bibliotecas
-#include <LiquidCrystal_I2C.h>  // PCF8574
+#include <LiquidCrystal_I2C.h>  //PCF8574
 
 
 //Variables
@@ -19,8 +19,9 @@ LiquidCrystal_I2C lcd_1(0x27, 16, 2);  //Dirección del LCD [PCF8574]
 
 //--------------------------------------------Propias funciones--------------------------------------------
 
-//*Manejar la velocidad con la que la persona tendrá que reaccionar*
+//**Manejar la velocidad con la que la persona tendrá que reaccionar y prendido/apagado de LEDS**
 void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
+  //Inicializar variable una sola vez y su valor no se resetea
   static bool yaEncendidos = false;
 
   if (millis() <= tiempo + tiempo_espera) {
@@ -33,11 +34,6 @@ void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int
   } else {
     if (millis() <= tiempo + tiempo_reaccion) {
       if (!yaEncendidos) {
-        // Apagar todos antes de empezar
-        for (int i = 0; i < 3; i++) {
-          digitalWrite(leds[i], LOW);
-          ledsActivos[i] = false;
-        }
 
         // Elegir una cantidad aleatoria de LEDs a prender
         int cantidadLEDs = random(minLEDs, maxLEDs + 1);
@@ -65,11 +61,14 @@ void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int
       tiempo = millis();
     }
   }
-}
-//*Manejar el tiempo de la ronda [EN SEGUNDOS]*
-void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
+}  //__Fin de la función__
+
+//**Manejar el tiempo de la ronda [EN SEGUNDOS] y Pantalla LCD**
+void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_inicio_ronda) {
   //'tiempo_inicio_ronda' es desde que tiempo de ejecución la ronda se inició
   int tiempo_transcurrido = (millis() / 1000 - tiempo_inicio_ronda);
+  static bool limpio = true, pausa = false;
+
 
   if (tiempo_transcurrido != ultimoTiempo) {
     lcd_1.setCursor(14, 0);
@@ -84,28 +83,37 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
       digitalWrite(leds[i], LOW);
       ledsActivos[i] = false;
     }
-    lcd_1.setCursor(0, 0);
-    lcd_1.print("FIN DE RONDA     ");
-    lcd_1.clear();
 
-    if (duracion_ronda - tiempo_transcurrido <= tiempoFinal - 1000) {
+    if (pausa == false) {
+      lcd_1.clear();
+      lcd_1.print("FIN DE LA RONDA");
+      limpio = false;
+      pausa = true;
+    }
+  } else {
+    if (millis() - tiempo_inicio_ronda > duracion_ronda + tiempo_pausa && limpio == false) {
+      lcd_1.clear();
+      lcd_1.setCursor(0, 0);
+      lcd_1.print("Contador");
+      lcd_1.setCursor(9, 0);
+      lcd_1.print("Ronda");
+      lcd_1.setCursor(3, 1);
+      lcd_1.print(contador);
+
+
       lcd_1.setCursor(14, 0);
       lcd_1.print(ronda);
       lcd_1.setCursor(11, 1);
       lcd_1.print(duracion_ronda - tiempo_transcurrido);
+      ultimoTiempo = tiempo_transcurrido;
 
-      lcd_1.clear()
-      //lcd_1.backlight();
+      limpio = true;
+      pausa = false;
     }
   }
-  lcd_1.setCursor(0, 0);
-  lcd_1.print("Contador");
-  lcd_1.setCursor(9, 0);
-  lcd_1.print("Ronda");
-  lcd_1.setCursor(3, 1);
-  lcd_1.print(contador);
 
-}  //_Fin de la función_
+
+}  //__Fin de la función__
 
 
 //--------------------------------------------Fin de las propias funciones--------------------------------------------
@@ -124,9 +132,12 @@ void setup() {
 
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
+  lcd_1.setCursor(0, 0);
   lcd_1.print("Contador");
-  lcd_1.setCursor(9, 0);  //lcd_1.setCursor(columna , fila)
+  lcd_1.setCursor(9, 0);
   lcd_1.print("Ronda");
+  lcd_1.setCursor(3, 1);
+  lcd_1.print(contador);
 }
 
 bool juegoTerminado = false;
@@ -138,14 +149,16 @@ void loop() {
     lcd_1.print(contador);
     ultimoConteo = contador;
   }
+
   if (millis() < 7000) {
-    Tiempo_ronda(1, 6, 0);
+    //ronda, duracion_ronda, tiempo_pausa, tiempo_inicio_ronda
+    Tiempo_ronda(1, 6, 3, 0);
     Velocidad_reaccion(1000, 3000, 1, 1);  // Solo 1 LED se prende
   } else if (millis() >= 8000 && millis() < 12000) {
-    Tiempo_ronda(2, 4, 7);
+    Tiempo_ronda(2, 4, 3, 7);
     Velocidad_reaccion(1000, 2000, 1, 2);  // Se prenden 1 o 2
-  } else if (millis() >= 13000 && millis() < 18000) {
-    Tiempo_ronda(3, 5, 12);
+  } else if (millis() >= 13000 && millis() < 17000) {
+    Tiempo_ronda(3, 5, 3, 12);
     Velocidad_reaccion(1000, 1500, 1, 3);  // Se prenden entre 1 y 3
   }
 
