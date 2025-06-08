@@ -129,6 +129,7 @@ void setup() {
   lcd_1.print("Ronda");
 }
 
+bool juegoTerminado = false;
 
 void loop() {
   //Imprimir contador en el LCD
@@ -170,16 +171,15 @@ void loop() {
   }
 
   //Pantalla final
-  if (millis() >= 17000) {
+  if (millis() >= 17000 && juegoTerminado == false) {
+    lcd_1.clear();
     lcd_1.setCursor(0, 0);
-    lcd_1.print("FIN     ");
+    lcd_1.print("FIN");
     lcd_1.setCursor(9, 0);
     lcd_1.print("Puntaje");
-    lcd_1.setCursor(1, 2);
-    lcd_1.print("       ");
-
-    lcd_1.setCursor(13, 2);
+    lcd_1.setCursor(12, 1);
     lcd_1.print(contador);
-    lcd_1.setCursor(13, 2);
+
+    juegoTerminado = true;
   }
 }  //Cierre del loop
