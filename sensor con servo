@@ -14,7 +14,6 @@ pinMode(trig, OUTPUT); //trig es salida. transmite el sonido.
 pinMode(echo, INPUT); //echo es entrada. recibe el rebote.
 // Asocio el servo al pin en el que está conectado
 topoEsc.attach(//numero de pin del servo);
-
 }
 
 void loop() {
@@ -39,4 +38,5 @@ topoEsc.write(180); //se mueve el servo a esos grados
 // Si la distancia es mayor a 20 cm, vuelvo el servo a 0°
 if(distancia >20) {
 topoEsc.write(0);
+}
 }
