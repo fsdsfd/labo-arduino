@@ -1,0 +1,42 @@
+#include <Servo.h> // Incluyo la librería para poder usar servos
+
+//Le pongo un nombre al servo
+Servo topoEsc;
+
+int trig = ; //defino pin
+int echo = ; //defino pin
+int tiempo; // Tiempo que tarda en llegar el rebote (en microsegundos)
+int distancia; // Distancia medida en centímetros
+
+void setup() {
+// Configuro los pines del sensor
+pinMode(trig, OUTPUT); //trig es salida. transmite el sonido.
+pinMode(echo, INPUT); //echo es entrada. recibe el rebote.
+// Asocio el servo al pin en el que está conectado
+topoEsc.attach(//numero de pin del servo);
+
+}
+
+void loop() {
+// Envío un pulso ultrasónico
+digitalWrite(trig, LOW);
+delayMicroseconds(2);            // Pequeña pausa antes del pulso
+digitalWrite(trig, HIGH);
+delayMicroseconds(10);           // Pulso de 10 microsegundos
+digitalWrite(trig, LOW);
+
+// OBS: el pulso TRIG debe durar solo 10 microsegundos, no milisegundos: (delay)(millis).
+
+tiempo=pulseIn(echo, HIGH);       //Mido el tiempo (en microsegundos) que tarda el rebote en llegar
+distancia=tiempo/58.2;       // Convierto ese tiempo a distancia (en cm)
+delay(500);       // Pausa antes de tomar otra medida
+
+// Si la distancia es menor o igual a 20 cm, muevo el servo a 180°
+if(distancia <=20) {
+topoEsc.write(180); //se mueve el servo a esos grados
+}
+
+// Si la distancia es mayor a 20 cm, vuelvo el servo a 0°
+if(distancia >20) {
+topoEsc.write(0);
+}
