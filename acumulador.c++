@@ -24,16 +24,18 @@ bool pantallaInicioMostrada = false;   // Evita mostrar el menú muchas veces
 unsigned long tiempoEnPantalla = 0;    // Momento en que se mostró el menú
 unsigned long tiempoDeJuego = 0;       // Tiempo transcurrido desde que empezó el juego
 
-// Variables para el topo con sensor y servo
+// Variables del topo (servo + sensor ultrasónico)
 Servo topo1;                       // Le pongo nombre al servo
 const int trig1 = 5;               // Transmisor
 const int echo1 = 6;               // Receptor
 const int servo1Pin = 7;           // Pin del servo
 bool topoActivo = false;
 unsigned long inicioTopo = 0;
-const unsigned long duracionTopo = 3000;
+const unsigned long duracionTopo = 3000; //3 segundos
+bool esperandoTopo = false;
+unsigned long proximoTopo = 0;  // Cuándo debe aparecer el siguiente topo
 
-
+bool juegoTerminado = false;
 
 //--------------------------------------------Propias funciones--------------------------------------------
 void Menu() {
@@ -54,15 +56,12 @@ static bool yaEncendidos = false;  //Inicializar variable una sola vez y su valo
       ledsActivos[i] = false;
     }
     yaEncendidos = false;
-
   } else {
     if (millis() <= tiempo + tiempo_reaccion) {
       if (!yaEncendidos) {
-
         // Elegir una cantidad aleatoria de LEDs a prender
         int cantidadLEDs = random(minLEDs, maxLEDs + 1);
         int encendidos = 0;
-
         while (encendidos < cantidadLEDs) {
           int elegido = random(0, 3);
           if (!ledsActivos[elegido]) {
@@ -71,10 +70,8 @@ static bool yaEncendidos = false;  //Inicializar variable una sola vez y su valo
             encendidos++;
           }
         }
-
         yaEncendidos = true;
       }
-
     } else {
       // Fin del ciclo: apagar todos y reiniciar
       for (int i = 0; i < 3; i++) {
@@ -109,7 +106,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
       ledsActivos[i] = false;
     }
 
-    if (pausa == false) {
+    if (!pausa) {
       lcd_1.clear();
       lcd_1.print("FIN DE LA RONDA");
       limpio = false;
@@ -124,8 +121,6 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
       lcd_1.print("Ronda");
       lcd_1.setCursor(3, 1);
       lcd_1.print(contador);
-
-
       lcd_1.setCursor(14, 0);
       lcd_1.print(ronda);
       lcd_1.setCursor(11, 1);
@@ -136,33 +131,77 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
       pausa = false;
     }
   }
-
-
 }  //__Fin de la función__
 
+void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecuenciaMin, int frecuenciaMax) {
+  unsigned long ahora = millis();
 
-//--------------------------------------------Fin de las propias funciones--------------------------------------------
+  if (ahora >= inicioRonda && ahora < finRonda) {
+    if (!topoActivo && !esperandoTopo) {
+      unsigned long intervalo = random(frecuenciaMin, frecuenciaMax);
+      proximoTopo = ahora + intervalo;
+      esperandoTopo = true;
+    }
+
+    if (!topoActivo && esperandoTopo && ahora >= proximoTopo) {
+      topo1.write(90);  // Sube el topo
+      inicioTopo = ahora;
+      topoActivo = true;
+      esperandoTopo = false;
+    }
+
+    if (topoActivo) {
+      digitalWrite(trig1, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig1, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig1, LOW);
+
+      long duracion = pulseIn(echo1, HIGH, 15000);
+      int distancia = duracion / 58;
+
+      if (distancia > 0 && distancia < 15) {
+        contador += 2;
+        topo1.write(0);  // Baja el topo
+        topoActivo = false;
+      } else if (ahora - inicioTopo >= duracionTopo) {
+        topo1.write(0);  // Baja el topo igual si se terminó el tiempo
+        topoActivo = false;
+      }
+    }
+  } else {
+    topo1.write(0);
+    topoActivo = false;
+    esperandoTopo = false;
+  }
+}
+
+
+
+//--------------------------------------------Fin de las propias funciones || SETUP--------------------------------------------
 
 
 void setup() {
   Serial.begin(9600);                   // Para mostrar datos por el monitor serial
+ 
   for (int i = 0; i < 3; i++) {
     pinMode(leds[i], OUTPUT);
     pinMode(botones[i], INPUT_PULLUP);  //Genera una resistencia interna en el PIN. Ahora, cuando el botón no esté presionado dará HIGH y si se presiona el botón dará LOW
   }
+  
   pinMode(botonMenu, INPUT_PULLUP);
-
   pinMode(trig1, OUTPUT);    //trig es salida. transmite el sonido.
   pinMode(echo1, INPUT);     //echo es entrada. recibe el rebote.
+  
   topo1.attach(servo1Pin);   // Asocio el servo al pin en el que está conectado 
   topo1.write(0);            // Su reposo es 0°.
   
   tiempo = millis();
   tiempoPrendido = millis();
   randomSeed(analogRead(A0));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
+  
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
-
   Menu();
 }
 
@@ -208,43 +247,15 @@ void loop() {
     if (tiempoDeJuego < 7000) {
       Tiempo_ronda(1, 6, 3, 0);
       Velocidad_reaccion(1000, 3000, 1, 1);
-    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 12000) {
-      Tiempo_ronda(2, 4, 3, 7);
+    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 12000) {  // Ronda 2: activa entre 8s-12s desde el inicio del juego.
+      Tiempo_ronda(2, 4, 3, 7); //2: número de ronda. 4: duración de la ronda en segundos. 3: pausa luego de la ronda. 7: momento de inicio (en segundos
       Velocidad_reaccion(1000, 2000, 1, 2);
+      ControlarTopo(8000, 12000, 2000, 4000); // El topo podrá aparecer entre 2 y 4 segundos de intervalo aleatorio dentro de esos 4 segundos totales.
     } else if (tiempoDeJuego >= 13000 && tiempoDeJuego < 17000) {
       Tiempo_ronda(3, 5, 3, 12);
       Velocidad_reaccion(1000, 1500, 1, 3);
+      ControlarTopo(13000, 17000, 1000, 2500);
     }
-
-    // Activar topo con sensor ultrasónico
-    /* if (tiempoDeJuego >= 9000 && tiempoDeJuego < 11000) {
-      if (!topoActivo) {
-        topo1.write(90);         // Topo sale
-        inicioTopo = millis();
-        topoActivo = true;
-      }
-
-      if (topoActivo && millis() - inicioTopo < duracionTopo) {
-        digitalWrite(trig1, LOW);
-        delayMicroseconds(2);
-        digitalWrite(trig1, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trig1, LOW);
-
-        int tiempoPulso = pulseIn(echo1, HIGH);
-        int distancia = tiempoPulso / 58.2;
-
-        if (distancia < 15) {
-          contador += 2; // Se suma doble si detecta la mano
-          topo1.write(0);
-          topoActivo = false;
-        }
-      } else if (topoActivo && millis() - inicioTopo >= duracionTopo) {
-        topo1.write(0);
-        topoActivo = false;
-      }
-    }
-    */
 
     // Verificar aciertos por botones LED
     for (int i = 0; i < 3; i++) {
