@@ -1,36 +1,42 @@
 //Bibliotecas
-#include <LiquidCrystal_I2C.h>  //PCF8574
+#include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables).
 
 
-//Variables
+//Variables globales
 int apagado = 1;
-int contador = 0;
-int ultimoConteo = -1;
-int ultimoTiempo = -1;
-int tiempoFinal = 0;
+int contador = 0;            // Puntaje (guarda cuántas veces el jugador acertó)
+int ultimoConteo = -1;       // Para saber si el puntaje cambió  
+int ultimoTiempo = -1;       // Para evitar repetir lo mismo en pantalla
+int tiempoFinal = 0;         // Para verificar si terminó la ronda
 int ledActivo = -1;
-unsigned long tiempo = 0;
+unsigned long tiempo = 0;    // Usado como millis()
 unsigned long tiempoPrendido = 0;
-const int leds[] = { 12, 10, 3 };               // Pines de salida para LEDs
-const int botones[] = { 11, 9, 2 };             // Pines de entrada para botones
+
+
+const int leds[] = { 12, 10, 3 };               // Pines de salida a LEDs
+const int botones[] = { 11, 9, 2 };             // Pines de entrada a botones
 bool ledsActivos[3] = { false, false, false };  // LEDs encendidos actualmente
-const int botonMenu = 4;
+
+const int botonMenu = 4;               // Botón para empezar
 LiquidCrystal_I2C lcd_1(0x27, 16, 2);  //Dirección del LCD [PCF8574]
-bool inicio = false;
-bool pantallaInicioMostrada = false;
+bool inicio = false;                   //El juegoya comenzó o no
+bool pantallaInicioMostrada = false;   //Evita mostrar el menú muchas veces
 
 //--------------------------------------------Propias funciones--------------------------------------------
+
 void Menu (){
-	lcd_1.setCursor(0, 0);
+    lcd_1.setCursor(0, 0);
     lcd_1.print("Atrapa al topo");
     lcd_1.setCursor(0, 1);
     lcd_1.print("Presione el boton");
-
 }
-//**Manejar la velocidad con la que la persona tendrá que reaccionar y prendido/apagado de LEDS**
-void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
-  //Inicializar variable una sola vez y su valor no se resetea
-  static bool yaEncendidos = false;
+
+//Muestra el texto de inicio en la pantalla LCD. Se llama una sola vez antes de jugar.
+
+//Manejar la velocidad con la que la persona tendrá que reaccionar y prendido/apagado de LEDS**
+
+void Velocidad_reaccion (int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
+static bool yaEncendidos = false; //Inicializar variable una sola vez y su valor no se resetea
 
   if (millis() <= tiempo + tiempo_espera) {
     for (int i = 0; i < 3; i++) {
@@ -71,11 +77,11 @@ void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int
   }
 }  //__Fin de la función__
 
-//**Manejar el tiempo de la ronda [EN SEGUNDOS] y Pantalla LCD**
+//Manejar el tiempo de la ronda [EN SEGUNDOS] y Pantalla LCD  
 void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_inicio_ronda) {
-  //'tiempo_inicio_ronda' es desde que tiempo de ejecución la ronda se inició
-  int tiempo_transcurrido = (millis() / 1000 - tiempo_inicio_ronda);
-  static bool limpio = true, pausa = false;
+//'tiempo_inicio_ronda' es desde que tiempo de ejecución la ronda se inició
+  int tiempo_transcurrido = (millis() / 1000 - tiempo_inicio_ronda); // Convierte millis() a segundos.
+  static bool limpio = true, pausa = false; //Guarda si ya mostró el mensaje "FIN DE LA RONDA".
 
 
   if (tiempo_transcurrido != ultimoTiempo) {
@@ -128,7 +134,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); // Para mostrar datos por el monitor serial
   for (int i = 0; i < 3; i++) {
     pinMode(leds[i], OUTPUT);
     pinMode(botones[i], INPUT);  // O INPUT_PULLUP si el botón va a GND
@@ -137,7 +143,7 @@ void setup() {
   tiempo = millis();
   tiempoPrendido = millis();
   int botonActivo = digitalRead(botonMenu);
-  randomSeed(analogRead(A0));
+  randomSeed(analogRead(A0)); //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
 
@@ -145,7 +151,7 @@ void setup() {
 
 }
 
-bool juegoTerminado = false;
+bool juegoTerminado = false; //Indica si el juego ya terminó (para no seguir ejecutando cosas).
 
 void loop() {
   // Mostrar menú solo una vez antes de que inicie el juego
@@ -186,15 +192,17 @@ void loop() {
       Velocidad_reaccion(1000, 1500, 1, 3);
     }
 
+
+// Detección de aciertos
     for (int i = 0; i < 3; i++) {
       int estado = digitalRead(botones[i]);
 
       if (estado == HIGH && apagado == 1 && ledsActivos[i]) {
         Serial.println(estado);
-        contador++;
-        apagado = 0;
+        contador++;                   //Sumas un punto
+        apagado = 0;                  //Para evitar multiple lectura   
         tiempoPrendido = millis();
-        digitalWrite(leds[i], LOW);
+        digitalWrite(leds[i], LOW);   //Apaga el LED
       } else {
         if (millis() - tiempoPrendido >= 20 && estado == LOW) {
           apagado = 1;
@@ -206,6 +214,7 @@ void loop() {
       }
     }
 
+//Final del juego
     if (millis() >= 17000 && !juegoTerminado) {
       lcd_1.clear();
       lcd_1.setCursor(0, 0);
