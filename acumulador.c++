@@ -6,16 +6,19 @@
 
 //Variables
 // Definiciones de la pantalla OLED
-#define SCREEN_WIDTH 128  // Ancho de la pantalla OLED
-#define SCREEN_HEIGHT 32  // Alto de la pantalla OLED
-#define OLED_RESET 8    // Reset de la pantalla OLED 
+#define SCREEN_WIDTH 128   
+// Ancho de la pantalla OLED
+#define SCREEN_HEIGHT 32  
+// Alto de la pantalla OLED
+#define OLED_RESET 8    
+// Reset de la pantalla OLED 
 
 int apagado = 1;
 int contador = 0;           // Puntaje (guarda cuántas veces el jugador acertó)
 int ultimoConteo = -1;      // Para saber si el puntaje cambió 
 int ultimoTiempo = -1;      // Para actualizar sólo si cambia el tiempo
 int tiempoFinal = 0;        // Para verificar si terminó la ronda
-int ledActivo = -1;
+int ledActivo = -1;         // Para indicar qué LED está activo
 unsigned long tiempo = 0;  // Marca de tiempo para los ciclos. Usado como millis()
 unsigned long tiempoPrendido = 0;  // Tiempo que un LED lleva encendido
 
@@ -38,14 +41,14 @@ unsigned long tiempoDeJuego = 0;       // Tiempo transcurrido desde que empezó 
 Servo topo1;                       // Le pongo nombre al servo
 const int trig1 = 5;               // Transmisor
 const int echo1 = 6;               // Receptor
-const int servo1Pin = 7;           // Pin del servo
-bool topoActivo = false;
-unsigned long inicioTopo = 0;
-const unsigned long duracionTopo = 3000; //3 segundos
-bool esperandoTopo = false;
-unsigned long proximoTopo = 0;  // Cuándo debe aparecer el siguiente topo
+const int servo1Pin = 7;           // Pin del servo1
+bool topoActivo = false;           // Para indicar si el topo se activó
+unsigned long inicioTopo = 0;      // Tiempo en que apareció el topo
+const unsigned long duracionTopo = 3000; // Duración MAX del topo visible: 3 segundos
+bool esperandoTopo = false;     // Indica si se está esperando a mostrar al topo1
+unsigned long proximoTopo = 0;  // Cuándo debe aparecer el siguiente topo1
 
-bool juegoTerminado = false;
+bool juegoTerminado = false;  //Indica si el juego terminó
 
 //--------------------------------------------Propias funciones--------------------------------------------
 void Menu() {
@@ -61,7 +64,7 @@ void Menu() {
   display.setCursor(0,0);
   display.println("Atrapa al topo");
   display.println("Presione boton");
-  display.display(); //Para que no se actualize inesecariamente
+  display.display(); //Para que no se actualize INNECESARIAMENTE*
 }
 
 void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
@@ -227,23 +230,23 @@ void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecue
 
 //--------------------------------------------Fin de las propias funciones || SETUP--------------------------------------------
 
-void setup() {
-  Serial.begin(9600);                   // Para mostrar datos por el monitor serial
+void setup() {                          // Función que se ejecuta 1 sola vez al inciar el juego
+  Serial.begin(9600);                   // Para mostrar datos por el monitor serial. a 9600 BAUDIOS.
  
-  for (int i = 0; i < 3; i++) {
-    pinMode(leds[i], OUTPUT);
+  for (int i = 0; i < 3; i++) {         //Bucle para configurar los LEDS y botones
+    pinMode(leds[i], OUTPUT);           //LEDS son salida
     pinMode(botones[i], INPUT_PULLUP);  //Genera una resistencia interna en el PIN. Ahora, cuando el botón no esté presionado dará HIGH y si se presiona el botón dará LOW
     
-  }
+  }//FinFor
   
-  pinMode(botonMenu, INPUT_PULLUP);
+  pinMode(botonMenu, INPUT_PULLUP); //Botón de "inicio de juego" con resistencia PULL-UP
   pinMode(trig1, OUTPUT);    //trig es salida. transmite el sonido.
   pinMode(echo1, INPUT);     //echo es entrada. recibe el rebote.
   
   topo1.attach(servo1Pin);   // Asocio el servo al pin en el que está conectado 
   topo1.write(0);            // Su reposo es 0°.
   
-  tiempo = millis();
+  tiempo = millis();        
   tiempoPrendido = millis();
   randomSeed(analogRead(A0));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
 
@@ -253,27 +256,27 @@ void setup() {
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
   Menu();
-}
+}//FinVOID
 
-void loop() {
-  int botonActivo = digitalRead(botonMenu);
-  tiempoDeJuego = millis() - tiempoEnPantalla;
+void loop() {  //Función principal que se repite continuamente mientras el Arduino esta prendido
+  int botonActivo = digitalRead(botonMenu);    //Lee el botón de inicio
+  tiempoDeJuego = millis() - tiempoEnPantalla; //Tiempo total del juego desde que se mostró el menú
 
   // Mostrar menú solo una vez antes de que inicie el juego
-  if (!inicio && !pantallaInicioMostrada) {
-    Menu();  // Muestra "Atrapa al topo" y "Presione el botón"
-    pantallaInicioMostrada = true;
+  if (!inicio && !pantallaInicioMostrada) {  //Si el juego no inicio Y el menú aún no se mostró...
+    Menu();                                  //Muestra "Atrapa al topo" y "Presione el botón"
+    pantallaInicioMostrada = true;           //Evita que el menú se muestre más de una vez
 
-    while (botonActivo) {
-      tiempoEnPantalla = millis();
-      botonActivo = digitalRead(botonMenu);
-    }
-  }
+    while (botonActivo) {                    //Espera  que se presione el boton para iniciar juego
+      tiempoEnPantalla = millis();           //Actualiza el momento en que el menú fue mostrado
+      botonActivo = digitalRead(botonMenu);  //Vuelve a leer el boton para salir del bucle si se presiona
+    } //FinWhile
+  } //FinIf
 
   // Esperar botón para iniciar el juego
-  if (!inicio && botonActivo == LOW) {
-    inicio = true;
-    tiempo = millis();  // Resetear el tiempo de juego
+  if (!inicio && botonActivo == LOW) { //Cuando se presiona el botón, inicia el juego
+    inicio = true;       //Marca quye el juego comenzó
+    tiempo = millis();   // Resetear el tiempo de juego
     lcd_1.clear();
     lcd_1.setCursor(0, 0);
     lcd_1.print("Contador");
@@ -281,50 +284,54 @@ void loop() {
     lcd_1.print("Ronda");
     lcd_1.setCursor(3, 1);
     lcd_1.print(contador);
-  }
+  }//Fin del IF que inicia el juego
 
   // Solo ejecutar el juego si ya empezó
-  if (inicio && !juegoTerminado) {
-    if (contador != ultimoConteo) {
+  if (inicio && !juegoTerminado) { //Si el juego está en curso Y no terminó...
+    if (contador != ultimoConteo) { //Si el puntaje cambió...
       lcd_1.setCursor(3, 1);
       lcd_1.print(contador);
-      ultimoConteo = contador;
-    }
+      ultimoConteo = contador; //Guarda el nuevo puntaje
+    }//Fin IF actualizacion de puntaje
 
   // Rondas del juego con LEDs y servo  
+
+  // PRIMERA RONDA sólo LEDS
     if (tiempoDeJuego < 7000) {
       Tiempo_ronda(1, 7, 3, 0);
       Velocidad_reaccion(1000, 3000, 1, 1);
-    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 15000) {  // Ronda 2 corregida
+  // SEGUNDA RONDA LEDS + Topo (uno a la vez)(agregar)
+    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 15000) {  
       Tiempo_ronda(2, 7, 3, 8); // AJUSTADO: inicia en segundo 8 real
-      Velocidad_reaccion(1000, 2000, 1, 2);
+      Velocidad_reaccion(1000, 2000, 1, 2); //Aumenta dificultad reacción
       ControlarTopo(8000, 15000, 2000, 4000);
+  // TERCERA RONDA LEDS + 2 TOPOS (posibles al mismo tiempo)(agregar)
     } else if (tiempoDeJuego >= 16000 && tiempoDeJuego < 23000) {
       Tiempo_ronda(3, 7, 3, 16);
-      Velocidad_reaccion(1000, 1500, 1, 3);
+      Velocidad_reaccion(1000, 1500, 1, 3); // Aún más reducido
       ControlarTopo(16000, 23000, 1000, 2500);
-    }
+    }//Fin RONDAS
 
     // Verificar aciertos por botones LED
-    for (int i = 0; i < 3; i++) {
-      int estado = digitalRead(botones[i]);
+    for (int i = 0; i < 3; i++) {            //Recorre todos los botones para verificar si se acertó
+      int estado = digitalRead(botones[i]);  //Lee el estado del botón i
 
-      if (estado == LOW && apagado == 1 && ledsActivos[i]) {
+      if (estado == LOW && apagado == 1 && ledsActivos[i]) { //Si el botón fue presionado Y el led correspondiente está activo...
         Serial.println(estado);
         contador++;                   //Sumas un punto
-        apagado = 0;                  //Para evitar multiple lectura 
-        tiempoPrendido = millis();
+        apagado = 0;                  //Para evitar multiple lectura del botón presionado
+        tiempoPrendido = millis();    //Actualiza el tiempo para control de rebote
         digitalWrite(leds[i], LOW);   //Apaga el LED
-      } else {
-        if (millis() - tiempoPrendido >= 20 && estado == HIGH) {
-          apagado = 1;
-        } else {
-          if (estado == LOW) {
-            tiempoPrendido = millis();
-          }
-        }
-      }
-    }
+      } else {                        //Si no se presionó el boton bien, analiza el rebote
+        if (millis() - tiempoPrendido >= 20 && estado == HIGH) {  //Si se terminó el tiempo para presionar, permite sumar puntos de nuevo
+          apagado = 1;                //Habilita de nuevo el botón
+        } else {                      //Si no terminó el tiempo pero el botón esta presionado...
+          if (estado == LOW) {        //Si sigue presionado, actualiza el tiempo de rebote
+            tiempoPrendido = millis(); //Actualiza el tiempo para reiniciar el control de rebote
+          }//Fin del If
+        }//Fin Else rebote
+      }//Fin Else principal
+    }//Fin Verificar botones
 
     //Final del juego
     if (tiempoDeJuego >= 23000 && !juegoTerminado) {
@@ -338,15 +345,15 @@ void loop() {
       lcd_1.print(contador);*/
 
 
-  display.clearDisplay();
+  display.clearDisplay();  //Limpia la pantalla OLED
   display.setCursor(0,0);
   display.println("FIN DEL JUEGO");
   display.print("Puntaje: ");
   display.println(contador);
-  display.display();
+  display.display();      //Actualiza la pantalla OLED con el contenido nuevo
 
 
-      juegoTerminado = true;
-    }
-  }
-}
+      juegoTerminado = true; //Para marcar que se terminó el juego y no se repita la sección
+    }//Fin bloque final del juego
+  }//Fin bloque preincipal del juego
+}//Fin del VOID
