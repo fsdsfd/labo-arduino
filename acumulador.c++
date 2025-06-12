@@ -1,8 +1,15 @@
 //Bibliotecas
+#include <adafruit_GFX.h>      // Librería de Adafruit
+#include <adafruit_SSD1306.h>  // Librería para pantallas OLED
 #include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables)
 #include <Servo.h>              // Librería para controlar servos
 
 //Variables
+// Definiciones de la pantalla OLED
+#define SCREEN_WIDTH 128  // Ancho de la pantalla OLED
+#define SCREEN_HEIGHT 32  // Alto de la pantalla OLED
+#define OLED_RESET 8    // Reset de la pantalla OLED 
+
 int apagado = 1;
 int contador = 0;           // Puntaje (guarda cuántas veces el jugador acertó)
 int ultimoConteo = -1;      // Para saber si el puntaje cambió 
@@ -18,6 +25,9 @@ bool ledsActivos[3] = { false, false, false };  // Estado de cada LED
 
 const int botonMenu = 4;               // Botón para empezar el juego
 LiquidCrystal_I2C lcd_1(0x27, 16, 2);  // Dirección del LCD [PCF8574]
+
+adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Pantalla OLED, es para usar el I2C
+
 bool inicio = false;                   // Marca si el juego ya comenzó
 bool pantallaInicioMostrada = false;   // Evita mostrar el menú muchas veces
 
@@ -40,10 +50,18 @@ bool juegoTerminado = false;
 //--------------------------------------------Propias funciones--------------------------------------------
 void Menu() {
 //Muestra el texto de inicio en la pantalla LCD. Se llama una sola vez antes de jugar.
-  lcd_1.setCursor(0, 0);
+  // Pantalla LCD 16x2
+  /*lcd_1.setCursor(0, 0);
   lcd_1.print("Atrapa al topo");
   lcd_1.setCursor(0, 1);
-  lcd_1.print("Presione el boton");
+  lcd_1.print("Presione el boton");*/
+
+   // OLED 128x32
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.println("Atrapa al topo");
+  display.println("Presione boton");
+  display.display(); //Para que no se actualize inesecariamente
 }
 
 void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
@@ -91,12 +109,23 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
   int tiempo_transcurrido = ((tiempoDeJuego / 1000) - tiempo_inicio_ronda); // Convierte millis() a segundos.
   static bool limpio = true, pausa = false; //Guarda si ya mostró el mensaje "FIN DE LA RONDA".
 
-
   if (tiempo_transcurrido != ultimoTiempo) {
-    lcd_1.setCursor(14, 0);
+    //DISPLAY LCD
+    /*lcd_1.setCursor(14, 0);
     lcd_1.print(ronda);
     lcd_1.setCursor(11, 1);
     lcd_1.print(duracion_ronda - tiempo_transcurrido);
+    ultimoTiempo = tiempo_transcurrido;*/
+
+    //DISPLAY OLED
+     display.clearDisplay();
+    display.setCursor(0,0);
+    display.print("Ronda: ");
+    display.println(ronda);
+    display.print("Tiempo: ");
+    display.println(duracion_ronda - tiempo_transcurrido);
+    display.display();
+
     ultimoTiempo = tiempo_transcurrido;
   }
 
@@ -107,14 +136,23 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
     }
 
     if (!pausa) {
-      lcd_1.clear();
-      lcd_1.print("FIN DE LA RONDA");
+      // Pantalla LCD 16x2  
+      /*lcd_1.clear();
+      lcd_1.print("FIN DE LA RONDA");*/
+
+       // OLED 128x32
+      display.clearDisplay();
+      display.setCursor(0,0);
+      display.println("FIN DE LA RONDA");
+      display.display();
+
       limpio = false;
       pausa = true;
     }
   } else {
     if (tiempoDeJuego - tiempo_inicio_ronda > duracion_ronda + tiempo_pausa && limpio == false) {
-      lcd_1.clear();
+      // Pantalla LCD 16x2  
+      /*lcd_1.clear();
       lcd_1.setCursor(0, 0);
       lcd_1.print("Contador");
       lcd_1.setCursor(9, 0);
@@ -125,6 +163,17 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
       lcd_1.print(ronda);
       lcd_1.setCursor(11, 1);
       lcd_1.print(duracion_ronda - tiempo_transcurrido);
+      ultimoTiempo = tiempo_transcurrido;*/
+
+        // OLED 128x32
+       display.clearDisplay();
+      display.setCursor(0,0);
+      display.print("Puntos: ");
+      display.println(contador);
+      display.print("Ronda: ");
+      display.println(ronda);
+      display.display();
+
       ultimoTiempo = tiempo_transcurrido;
 
       limpio = true;
@@ -161,7 +210,7 @@ void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecue
       int distancia = duracion / 58;
 
       if (distancia > 0 && distancia < 15) {
-        contador += 2;
+        contador += 2; // DOBLE puntaje si el sensor detecta el topo
         topo1.write(0);  // Baja el topo
         topoActivo = false;
       } else if (ahora - inicioTopo >= duracionTopo) {
@@ -176,10 +225,7 @@ void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecue
   }
 }
 
-
-
 //--------------------------------------------Fin de las propias funciones || SETUP--------------------------------------------
-
 
 void setup() {
   Serial.begin(9600);                   // Para mostrar datos por el monitor serial
@@ -187,6 +233,7 @@ void setup() {
   for (int i = 0; i < 3; i++) {
     pinMode(leds[i], OUTPUT);
     pinMode(botones[i], INPUT_PULLUP);  //Genera una resistencia interna en el PIN. Ahora, cuando el botón no esté presionado dará HIGH y si se presiona el botón dará LOW
+    
   }
   
   pinMode(botonMenu, INPUT_PULLUP);
@@ -199,13 +246,14 @@ void setup() {
   tiempo = millis();
   tiempoPrendido = millis();
   randomSeed(analogRead(A0));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
+
+  wire.begin();  // Iniciar la comunicación I2C OLED
+  oled.begin(SSD1306_SWITCHCAPVCC, 0X3C);  // Iniciar la pantalla OLED 0X3D es para el OLED 128x64
   
   lcd_1.init();       //Inicializar el LCD
   lcd_1.backlight();  //Prender la pantalla
   Menu();
 }
-
-bool juegoTerminado = false; //Indica si el juego ya terminó (para no seguir ejecutando cosas).
 
 void loop() {
   int botonActivo = digitalRead(botonMenu);
@@ -245,16 +293,16 @@ void loop() {
 
   // Rondas del juego con LEDs y servo  
     if (tiempoDeJuego < 7000) {
-      Tiempo_ronda(1, 6, 3, 0);
+      Tiempo_ronda(1, 7, 3, 0);
       Velocidad_reaccion(1000, 3000, 1, 1);
-    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 12000) {  // Ronda 2: activa entre 8s-12s desde el inicio del juego.
-      Tiempo_ronda(2, 4, 3, 7); //2: número de ronda. 4: duración de la ronda en segundos. 3: pausa luego de la ronda. 7: momento de inicio (en segundos
+    } else if (tiempoDeJuego >= 8000 && tiempoDeJuego < 15000) {  // Ronda 2 corregida
+      Tiempo_ronda(2, 7, 3, 8); // AJUSTADO: inicia en segundo 8 real
       Velocidad_reaccion(1000, 2000, 1, 2);
-      ControlarTopo(8000, 12000, 2000, 4000); // El topo podrá aparecer entre 2 y 4 segundos de intervalo aleatorio dentro de esos 4 segundos totales.
-    } else if (tiempoDeJuego >= 13000 && tiempoDeJuego < 17000) {
-      Tiempo_ronda(3, 5, 3, 12);
+      ControlarTopo(8000, 15000, 2000, 4000);
+    } else if (tiempoDeJuego >= 16000 && tiempoDeJuego < 23000) {
+      Tiempo_ronda(3, 7, 3, 16);
       Velocidad_reaccion(1000, 1500, 1, 3);
-      ControlarTopo(13000, 17000, 1000, 2500);
+      ControlarTopo(16000, 23000, 1000, 2500);
     }
 
     // Verificar aciertos por botones LED
@@ -279,15 +327,26 @@ void loop() {
     }
 
     //Final del juego
-    if (tiempoDeJuego >= 17000 && !juegoTerminado) {
-      lcd_1.clear();
+    if (tiempoDeJuego >= 23000 && !juegoTerminado) {
+        // Pantalla LCD 16x2
+      /*lcd_1.clear();
       lcd_1.setCursor(0, 0);
       lcd_1.print("FIN");
       lcd_1.setCursor(9, 0);
       lcd_1.print("Puntaje");
       lcd_1.setCursor(12, 1);
-      lcd_1.print(contador);
+      lcd_1.print(contador);*/
+
+
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.println("FIN DEL JUEGO");
+  display.print("Puntaje: ");
+  display.println(contador);
+  display.display();
+
+
       juegoTerminado = true;
     }
   }
-}  // Cierre del loop
+}
