@@ -183,7 +183,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
 }  //__Fin de la función__
 
 void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecuenciaMin, int frecuenciaMax) {
-  unsigned long ahora = millis();
+  unsigned long ahora = tiempoDeJuego);
 
   if (ahora >= inicioRonda && ahora < finRonda) {
     if (!topoActivo && !esperandoTopo) {
