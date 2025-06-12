@@ -1,8 +1,9 @@
 //Bibliotecas
 #include <Adafruit_GFX.h>      // Librería de Adafruit
 #include <Adafruit_SSD1306.h>  // Librería para pantallas OLED
-#include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables)
+//#include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables)
 #include <Servo.h>              // Librería para controlar servos
+#include <SPI.h>
 
 //Variables
 // Definiciones de la pantalla OLED
@@ -10,7 +11,7 @@
 // Ancho de la pantalla OLED
 #define SCREEN_HEIGHT 32  
 // Alto de la pantalla OLED
-#define OLED_RESET 8    
+#define OLED_RESET -1    
 // Reset de la pantalla OLED 
 
 int apagado = 1;
@@ -27,7 +28,7 @@ const int botones[] = { 11, 9, 2 };             // Pines de entrada para botones
 bool ledsActivos[3] = { false, false, false };  // Estado de cada LED
 
 const int botonMenu = 4;               // Botón para empezar el juego
-LiquidCrystal_I2C lcd_1(0x27, 16, 2);  // Dirección del LCD [PCF8574]
+//LiquidCrystal_I2C lcd_1(0x27, 16, 2);  // Dirección del LCD [PCF8574]
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Pantalla OLED, es para usar el I2C
 
@@ -61,9 +62,12 @@ void Menu() {
 
    // OLED 128x32
   display.clearDisplay();
+  display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);
   display.setCursor(0,0);
-  display.println("Atrapa al topo");
-  display.println("Presione boton");
+  display.println(F("Atrapa al topo"));
+    display.setCursor(0,10);
+  display.println(F("Presione boton"));
   display.display(); //Para que no se actualize INNECESARIAMENTE*
 }
 
@@ -118,14 +122,14 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
     lcd_1.print(ronda);
     lcd_1.setCursor(11, 1);
     lcd_1.print(duracion_ronda - tiempo_transcurrido); */
-    ultimoTiempo = tiempo_transcurrido;
+    // ultimoTiempo = tiempo_transcurrido;
 
     //DISPLAY OLED
     display.clearDisplay();
     display.setCursor(0,0);
-    display.print("Ronda: ");
+    display.print(F("Ronda: "));
     display.println(ronda);
-    display.print("Tiempo: ");
+    display.print(F("Tiempo: "));
     display.println(duracion_ronda - tiempo_transcurrido);
     display.display();
 
@@ -145,8 +149,9 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
 
        // OLED 128x32
       display.clearDisplay();
-      display.setCursor(0,0);
-      display.println("FIN DE LA RONDA");
+        display.setTextSize(1); 
+      display.setCursor(20,0);
+      display.println(F("FIN DE LA RONDA"));
       display.display();
 
       limpio = false;
@@ -170,12 +175,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
 
         // OLED 128x32
       display.clearDisplay();
-      display.setCursor(0,0);
-      display.print("Puntos: ");
-      display.println(contador);
-      display.print("Ronda: ");
-      display.println(ronda);
-      display.display();
+
 
       ultimoTiempo = tiempo_transcurrido;
 
@@ -212,7 +212,7 @@ void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecue
       long duracion = pulseIn(echo1, HIGH, 15000);
       int distancia = duracion / 58;
 
-      if (distancia > 0 && distancia < 15) {
+      if (distancia > 0 && distancia < 7) {
         contador += 2; // DOBLE puntaje si el sensor detecta el topo
         topo1.write(0);  // Baja el topo
         topoActivo = false;
@@ -287,9 +287,11 @@ void loop() {  //Función principal que se repite continuamente mientras el Ardu
     lcd_1.setCursor(3, 1);
     lcd_1.print(contador);*/
     display.clearDisplay();             // Limpia la pantalla OLED
-    display.setCursor(0, 0);
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);    
+    display.setCursor(0, 4);
     display.println("Contador");       // Título
-    display.setCursor(0, 1);
+    display.setCursor(0, 0);
     display.print("Puntos: ");         // Mostrar puntaje inicial
     display.print(contador);
     display.display();                 // Actualiza la pantalla
