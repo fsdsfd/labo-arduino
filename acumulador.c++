@@ -1,6 +1,6 @@
 //Bibliotecas
-#include <adafruit_GFX.h>      // Librería de Adafruit
-#include <adafruit_SSD1306.h>  // Librería para pantallas OLED
+#include <Adafruit_GFX.h>      // Librería de Adafruit
+#include <Adafruit_SSD1306.h>  // Librería para pantallas OLED
 #include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables)
 #include <Servo.h>              // Librería para controlar servos
 
@@ -29,7 +29,7 @@ bool ledsActivos[3] = { false, false, false };  // Estado de cada LED
 const int botonMenu = 4;               // Botón para empezar el juego
 LiquidCrystal_I2C lcd_1(0x27, 16, 2);  // Dirección del LCD [PCF8574]
 
-adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Pantalla OLED, es para usar el I2C
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Pantalla OLED, es para usar el I2C
 
 bool inicio = false;                   // Marca si el juego ya comenzó
 bool pantallaInicioMostrada = false;   // Evita mostrar el menú muchas veces
@@ -117,11 +117,11 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
     /*lcd_1.setCursor(14, 0);
     lcd_1.print(ronda);
     lcd_1.setCursor(11, 1);
-    lcd_1.print(duracion_ronda - tiempo_transcurrido);
-    ultimoTiempo = tiempo_transcurrido;*/
+    lcd_1.print(duracion_ronda - tiempo_transcurrido); */
+    ultimoTiempo = tiempo_transcurrido;
 
     //DISPLAY OLED
-     display.clearDisplay();
+    display.clearDisplay();
     display.setCursor(0,0);
     display.print("Ronda: ");
     display.println(ronda);
@@ -169,7 +169,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
       ultimoTiempo = tiempo_transcurrido;*/
 
         // OLED 128x32
-       display.clearDisplay();
+      display.clearDisplay();
       display.setCursor(0,0);
       display.print("Puntos: ");
       display.println(contador);
@@ -186,7 +186,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_pausa, int tiempo_in
 }  //__Fin de la función__
 
 void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecuenciaMin, int frecuenciaMax) {
-  unsigned long ahora = tiempoDeJuego);
+  unsigned long ahora = tiempoDeJuego;
 
   if (ahora >= inicioRonda && ahora < finRonda) {
     if (!topoActivo && !esperandoTopo) {
@@ -250,11 +250,13 @@ void setup() {                          // Función que se ejecuta 1 sola vez al
   tiempoPrendido = millis();
   randomSeed(analogRead(A0));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
 
-  wire.begin();  // Iniciar la comunicación I2C OLED
-  oled.begin(SSD1306_SWITCHCAPVCC, 0X3C);  // Iniciar la pantalla OLED 0X3D es para el OLED 128x64
-  
-  lcd_1.init();       //Inicializar el LCD
-  lcd_1.backlight();  //Prender la pantalla
+  Wire.begin();  // Iniciar la comunicación I2C OLED
+  display.begin(SSD1306_SWITCHCAPVCC, 0X3C);  // Iniciar la pantalla OLED 0X3D es para el OLED 128x64
+  display.clearDisplay(); //Limpia cualquier texto previo
+  display.display();      //Aplica los cambios de pantalla
+
+  //lcd_1.init();       //Inicializar el LCD
+  //lcd_1.backlight();  //Prender la pantalla
   Menu();
 }//FinVOID
 
@@ -277,20 +279,27 @@ void loop() {  //Función principal que se repite continuamente mientras el Ardu
   if (!inicio && botonActivo == LOW) { //Cuando se presiona el botón, inicia el juego
     inicio = true;       //Marca quye el juego comenzó
     tiempo = millis();   // Resetear el tiempo de juego
-    lcd_1.clear();
+    /*lcd_1.clear();
     lcd_1.setCursor(0, 0);
     lcd_1.print("Contador");
     lcd_1.setCursor(9, 0);
     lcd_1.print("Ronda");
     lcd_1.setCursor(3, 1);
-    lcd_1.print(contador);
+    lcd_1.print(contador);*/
+    display.clearDisplay();             // Limpia la pantalla OLED
+    display.setCursor(0, 0);
+    display.println("Contador");       // Título
+    display.setCursor(0, 1);
+    display.print("Puntos: ");         // Mostrar puntaje inicial
+    display.print(contador);
+    display.display();                 // Actualiza la pantalla
   }//Fin del IF que inicia el juego
 
   // Solo ejecutar el juego si ya empezó
   if (inicio && !juegoTerminado) { //Si el juego está en curso Y no terminó...
     if (contador != ultimoConteo) { //Si el puntaje cambió...
-      lcd_1.setCursor(3, 1);
-      lcd_1.print(contador);
+      /*lcd_1.setCursor(3, 1);
+      lcd_1.print(contador);*/
       ultimoConteo = contador; //Guarda el nuevo puntaje
     }//Fin IF actualizacion de puntaje
 
