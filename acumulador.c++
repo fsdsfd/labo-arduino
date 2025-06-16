@@ -1,8 +1,8 @@
+
 //Bibliotecas
 #include <Wire.h>
 #include <Adafruit_GFX.h>      // Librería de Adafruit
 #include <Adafruit_SSD1306.h>  // Librería para pantallas OLED
-//#include <LiquidCrystal_I2C.h>  // chip PCF8574 (ahorra cables)
 #include <Servo.h>  // Librería para controlar servos
 
 //Variables
@@ -64,7 +64,6 @@ const int botones[] = { 11, 9, 2 };             // Pines de entrada para botones
 bool ledsActivos[3] = { false, false, false };  // Estado de cada LED
 
 const int botonMenu = 4;  // Botón para empezar el juego
-//LiquidCrystal_I2C lcd_1(0x27, 16, 2);  // Dirección del LCD [PCF8574]
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);  // Pantalla OLED, es para usar el I2C
 
@@ -97,18 +96,12 @@ unsigned long proximoTopo2 = 0;
 
 //--------------------------------------------Propias funciones--------------------------------------------
 void Menu() {
-  //Muestra el texto de inicio en la pantalla LCD. Se llama una sola vez antes de jugar.
-  // Pantalla LCD 16x2
-  /*lcd_1.setCursor(0, 0);
-  lcd_1.print("Atrapa al topo");
-  lcd_1.setCursor(0, 1);
-  lcd_1.print("Presione el boton");*/
-
   // OLED 128x32
   display.clearDisplay();
   display.drawBitmap(0, 0, topo_bitmapponele2, 128, 32, WHITE);
   display.display();  //Para que no se actualize INNECESARIAMENTE*
 }
+
 
 void Velocidad_reaccion(int tiempo_espera, int tiempo_reaccion, int minLEDs, int maxLEDs) {
   //Manejar la velocidad con la que la persona tendrá que reaccionar y prendido/apagado de LEDS**
@@ -156,13 +149,6 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
   static bool limpio = true, pausa = false;                                  //Guarda si ya mostró el mensaje "FIN DE LA RONDA".
 
   if (tiempo_transcurrido != ultimoTiempo) {
-    //DISPLAY LCD
-    /*lcd_1.setCursor(14, 0);
-    lcd_1.print(ronda);
-    lcd_1.setCursor(11, 1);
-    lcd_1.print(duracion_ronda - tiempo_transcurrido); */
-    // ultimoTiempo = tiempo_transcurrido;
-
     //DISPLAY OLED
     display.clearDisplay();
     display.setCursor(0, 0);
@@ -182,40 +168,26 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
 
   if (duracion_ronda - tiempo_transcurrido == tiempoFinal) {
     for (int i = 0; i < 3; i++) {
+      
       digitalWrite(leds[i], LOW);
       ledsActivos[i] = false;
     }
 
 
     if (!pausa) {
-      // Pantalla LCD 16x2
-      /*lcd_1.clear();
-      lcd_1.print("FIN DE LA RONDA");*/
       display.clearDisplay();
       display.setCursor(20, 0);
       display.println(F("FIN DE LA RONDA"));
+      display.setCursor(20, 20);
+      display.println(F("SIGUIENTE RONDA"));
       display.display();
-      // OLED 128x32
+      display.clearDisplay();
       limpio = false;
       pausa = true;
     }
+
   } else {
     if (limpio == false) {
-      // Pantalla LCD 16x2
-      /*lcd_1.clear();
-      lcd_1.setCursor(0, 0);
-      lcd_1.print("Contador");
-      lcd_1.setCursor(9, 0);
-      lcd_1.print("Ronda");
-      lcd_1.setCursor(3, 1);
-      lcd_1.print(contador);
-      lcd_1.setCursor(14, 0);
-      lcd_1.print(ronda);
-      lcd_1.setCursor(11, 1);
-      lcd_1.print(duracion_ronda - tiempo_transcurrido);
-      ultimoTiempo = tiempo_transcurrido;*/
-
-      // OLED 128x32
       display.clearDisplay();
 
 
@@ -316,15 +288,10 @@ void ControlarTopo2(unsigned long inicioRonda, unsigned long finRonda, int frecu
 
 void setup() {                                             // Función que se ejecuta 1 sola vez al inciar el juego
   Serial.begin(9600);                                      // Para mostrar datos por el monitor serial. a 9600 BAUDIOS.
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {        // Si la conexion I2C con el OLED falla
-    Serial.println(F("Falla conexión con SSD1306 OLED"));  // imprime en monitor serie
-    while (1)
-      ;
-  }
-  /*pinMode(trig2, OUTPUT);
+  pinMode(trig2, OUTPUT);
   pinMode(echo2, INPUT);
   topo2.attach(servo2Pin);
-  topo2.write(0);*/
+  topo2.write(0);
   for (int i = 0; i < 3; i++) {         //Bucle para configurar los LEDS y botones
     pinMode(leds[i], OUTPUT);           //LEDS son salida
     pinMode(botones[i], INPUT_PULLUP);  //Genera una resistencia interna en el PIN. Ahora, cuando el botón no esté presionado dará HIGH y si se presiona el botón dará LOW
@@ -347,8 +314,6 @@ void setup() {                                             // Función que se ej
   display.clearDisplay();                     //Limpia cualquier texto previo
   display.display();                          //Aplica los cambios de pantalla
   display.setTextSize(1);
-  //lcd_1.init();       //Inicializar el LCD
-  //lcd_1.backlight();  //Prender la pantalla
   Menu();
 }  //FinVOID
 
@@ -371,22 +336,12 @@ void loop() {                                   //Función principal que se repi
     inicio = true;                      //Marca quye el juego comenzó
     tiempo = millis();                  // Resetear el tiempo de juego
     display.setTextColor(SSD1306_WHITE);
-    /*lcd_1.clear();
-    lcd_1.setCursor(0, 0);
-    lcd_1.print("Contador");
-    lcd_1.setCursor(9, 0);
-    lcd_1.print("Ronda");
-    lcd_1.setCursor(3, 1);
-    lcd_1.print(contador);*/
-
-    // Actualiza la pantalla
   }  //Fin del IF que inicia el juego
 
   // Solo ejecutar el juego si ya empezó
   if (inicio && !juegoTerminado) {   //Si el juego está en curso Y no terminó...
     if (contador != ultimoConteo) {  //Si el puntaje cambió...
-      /*lcd_1.setCursor(3, 1);
-      lcd_1.print(contador);*/
+  
       ultimoConteo = contador;  //Guarda el nuevo puntaje
     }                           //Fin IF actualizacion de puntaje
 
@@ -441,16 +396,6 @@ void loop() {                                   //Función principal que se repi
 
     //Final del juego
     if (tiempoDeJuego >= 25000 && !juegoTerminado) {
-      // Pantalla LCD 16x2
-      /*lcd_1.clear();
-      lcd_1.setCursor(0, 0);
-      lcd_1.print("FIN");
-      lcd_1.setCursor(9, 0);
-      lcd_1.print("Puntaje");
-      lcd_1.setCursor(12, 1);
-      lcd_1.print(contador);*/
-
-
       display.clearDisplay();  //Limpia la pantalla OLED
       display.setCursor(25, 0);
       display.println("FIN DEL JUEGO");
