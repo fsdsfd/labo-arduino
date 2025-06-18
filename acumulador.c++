@@ -408,4 +408,32 @@ void loop() {                                   //Función principal que se repi
       juegoTerminado = true;  //Para marcar que se terminó el juego y no se repita la sección
     }                         //Fin bloque final del juego
   }                           //Fin bloque preincipal del juego
+    if (juegoTerminado && botonActivo == LOW) {//reinicio las variables, reinicio el juego
+    contador = 0;
+    ultimoConteo = -1;
+    ultimoTiempo = -1;
+    tiempoFinal = 0;
+    ledActivo = -1;
+    tiempo = millis();
+    tiempoPrendido = millis();
+    tiempoEnPantalla = millis();
+    pantallaInicioMostrada = false;
+    inicio = false;
+    juegoTerminado = false;
+    topoActivo = false;
+    topo2Activo = false;
+    esperandoTopo = false;
+    esperandoTopo2 = false;
+    topo1.write(0);
+    topo2.write(0);
+
+    for (int i = 0; i < 3; i++) {//apago los leds
+      digitalWrite(leds[i], LOW);
+      ledsActivos[i] = false;
+}
+    Menu(); //muestro elk menu de nuevo
+        while (digitalRead(botonMenu) == LOW) {// al tocar el boton vuelve al menu, y espera a que el jugador presione nuevamente
+      delay(10);
+  }
+}
 }
