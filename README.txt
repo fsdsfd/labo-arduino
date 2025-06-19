@@ -3,7 +3,7 @@
 Este proyecto es una versión electrónica del clásico juego "Atrapa al Topo", desarrollado con Arduino UNO, servos, sensores ultrasónicos, una pantalla OLED y botones con LEDs. El objetivo es golpear al topo cuando aparece y sumar la mayor cantidad de puntos en el tiempo límite.
 
 
-#🛠 Componentes Utilizados
+# 🛠 Componentes Utilizados
 
 - 1x Arduino UNO
 - 1x Pantalla OLED 128x32 (I2C)
@@ -26,7 +26,7 @@ Este proyecto es una versión electrónica del clásico juego "Atrapa al Topo", 
 - La puntuación se muestra en pantalla junto con el número de ronda y tiempo restante.
 - Reinicio automático del juego tras finalizar, esperando nuevamente al botón de inicio.
 
-#💡 Lógica del Juego
+# 💡 Lógica del Juego
 
 1. Pantalla de Inicio: Se muestra una imagen con la leyenda "PRESS START". El juego comienza cuando se presiona el botón de inicio.
 2. LEDs: Se encienden al azar y el jugador debe presionar el botón correspondiente. Cada acierto suma 1 punto.
@@ -50,8 +50,8 @@ También hay texto informativo durante el juego. Las bibliotecas usadas son Adaf
   - Velocidad_reaccion(): Controla los LEDs según la ronda.
   - Tiempo_ronda(): Muestra y controla el cronómetro y estado de cada ronda.
   - ControlarTopo() y ControlarTopo2(): Manejan los servos y sensores ultrasónicos.
-- *setup()*: Inicializa pantalla, servos, pines y muestra el menú.
-- *loop()*: Controla la lógica del juego, las rondas, puntaje y reinicio.
+  - setup(): Inicializa pantalla, servos, pines y muestra el menú.
+  - loop(): Controla la lógica del juego, las rondas, puntaje y reinicio.
 
 # ✍ Autores
 
