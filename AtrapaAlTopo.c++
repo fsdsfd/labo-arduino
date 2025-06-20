@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>      // Librería de Adafruit
 #include <Adafruit_SSD1306.h>  // Librería para pantallas OLED
-#include <Servo.h>  // Librería para controlar servos
+#include <Servo.h>             // Librería para controlar servos
 
 //Variables
 // Definiciones de la pantalla OLED
@@ -168,7 +168,7 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
 
   if (duracion_ronda - tiempo_transcurrido == tiempoFinal) {
     for (int i = 0; i < 3; i++) {
-      
+
       digitalWrite(leds[i], LOW);
       ledsActivos[i] = false;
     }
@@ -286,8 +286,8 @@ void ControlarTopo2(unsigned long inicioRonda, unsigned long finRonda, int frecu
 
 //--------------------------------------------Fin de las propias funciones || SETUP--------------------------------------------
 
-void setup() {                                             // Función que se ejecuta 1 sola vez al inciar el juego
-  Serial.begin(9600);                                      // Para mostrar datos por el monitor serial. a 9600 BAUDIOS.
+void setup() {         // Función que se ejecuta 1 sola vez al inciar el juego
+  Serial.begin(9600);  // Para mostrar datos por el monitor serial. a 9600 BAUDIOS.
   pinMode(trig2, OUTPUT);
   pinMode(echo2, INPUT);
   topo2.attach(servo2Pin);
@@ -307,7 +307,7 @@ void setup() {                                             // Función que se ej
 
   tiempo = millis();
   tiempoPrendido = millis();
-  randomSeed(analogRead(A0));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A0.
+  randomSeed(analogRead(A2));  //Inicia el generador de números aleatorios con un valor "ruidoso" del pin A2.
 
   Wire.begin();                               // Iniciar la comunicación I2C OLED
   display.begin(SSD1306_SWITCHCAPVCC, 0X3C);  // Iniciar la pantalla OLED 0X3D es para el OLED 128x64
@@ -341,7 +341,7 @@ void loop() {                                   //Función principal que se repi
   // Solo ejecutar el juego si ya empezó
   if (inicio && !juegoTerminado) {   //Si el juego está en curso Y no terminó...
     if (contador != ultimoConteo) {  //Si el puntaje cambió...
-  
+
       ultimoConteo = contador;  //Guarda el nuevo puntaje
     }                           //Fin IF actualizacion de puntaje
 
@@ -356,7 +356,7 @@ void loop() {                                   //Función principal que se repi
       Tiempo_ronda(2, 7, 9);
       Velocidad_reaccion(1000, 2000, 1, 2);
 
-      if (random(1, 2) == 1) {
+      if (random(1, 3) == 1) {
         ControlarTopo(8000, 15000, 2000, 4000);  // solo uno de los dos
       } else {
         ControlarTopo2(8000, 15000, 2000, 4000);
@@ -408,7 +408,9 @@ void loop() {                                   //Función principal que se repi
       juegoTerminado = true;  //Para marcar que se terminó el juego y no se repita la sección
     }                         //Fin bloque final del juego
   }                           //Fin bloque preincipal del juego
-    if (juegoTerminado && botonActivo == LOW) {//reinicio las variables, reinicio el juego
+
+  //Reinicio las variables y del juego
+  if (juegoTerminado && botonActivo == LOW) {
     contador = 0;
     ultimoConteo = -1;
     ultimoTiempo = -1;
@@ -427,13 +429,13 @@ void loop() {                                   //Función principal que se repi
     topo1.write(0);
     topo2.write(0);
 
-    for (int i = 0; i < 3; i++) {//apago los leds
+    for (int i = 0; i < 3; i++) {  //apago los leds
       digitalWrite(leds[i], LOW);
       ledsActivos[i] = false;
-}
-    Menu(); //muestro elk menu de nuevo
-        while (digitalRead(botonMenu) == LOW) {// al tocar el boton vuelve al menu, y espera a que el jugador presione nuevamente
+    }
+    Menu();                                  //muestro elk menu de nuevo
+    while (digitalRead(botonMenu) == LOW) {  // al tocar el boton vuelve al menu, y espera a que el jugador presione nuevamente
       delay(10);
+    }
   }
-}
 }
