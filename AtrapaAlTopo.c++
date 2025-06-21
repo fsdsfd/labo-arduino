@@ -348,27 +348,27 @@ void loop() {                                   //Función principal que se repi
     // Rondas del juego con LEDs y servo
 
     // PRIMERA RONDA sólo LEDS
-    if (tiempoDeJuego < 8000) {
-      Tiempo_ronda(1, 7, 0);
+    if (tiempoDeJuego < 10000) {
+      Tiempo_ronda(1, 9, 0);
       Velocidad_reaccion(1000, 3000, 1, 1);
       // SEGUNDA RONDA LEDS + Topo (uno a la vez)(agregar)
-    } else if (tiempoDeJuego >= 9000 && tiempoDeJuego < 17000) {
-      Tiempo_ronda(2, 7, 9);
+    } else if (tiempoDeJuego >= 12000 && tiempoDeJuego < 23000) {
+      Tiempo_ronda(2, 10, 12);
       Velocidad_reaccion(1000, 2000, 1, 2);
 
       if (random(1, 3) == 1) {
-        ControlarTopo(8000, 15000, 2000, 4000);  // solo uno de los dos
+        ControlarTopo(12000, 22000, 2000, 4000);  // solo uno de los dos
       } else {
-        ControlarTopo2(8000, 15000, 2000, 4000);
+        ControlarTopo2(12000, 22000, 2000, 4000);
       }
 
       // RONDA 3
-    } else if (tiempoDeJuego >= 18000 && tiempoDeJuego < 25000) {
-      Tiempo_ronda(3, 7, 18);
+    } else if (tiempoDeJuego >= 24000 && tiempoDeJuego < 40000) {
+      Tiempo_ronda(3, 16, 24);
       Velocidad_reaccion(1000, 1500, 1, 3);
 
-      ControlarTopo(16000, 23000, 1000, 2500);
-      ControlarTopo2(16000, 23000, 1000, 2500);
+      ControlarTopo(24000, 39000, 1000, 2500);
+      ControlarTopo2(24000, 39000, 1000, 2500);
     }
 
 
@@ -395,7 +395,7 @@ void loop() {                                   //Función principal que se repi
     }                                                             //Fin Verificar botones
 
     //Final del juego
-    if (tiempoDeJuego >= 25000 && !juegoTerminado) {
+    if (tiempoDeJuego >= 40000 && !juegoTerminado) {
       display.clearDisplay();  //Limpia la pantalla OLED
       display.setCursor(25, 0);
       display.println("FIN DEL JUEGO");
