@@ -15,7 +15,7 @@
 // Reset de la pantalla OLED
 
 //IMAGEN DE MENU
-const unsigned char topo_bitmapponele2[] PROGMEM = {
+const unsigned char topo_bitmapponele2[] PROGMEM = { //PROGMEM lo guarda en la memoria flash (32kb), no la RAM (2kb)
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c, 0x00, 0x00, 0x00,
@@ -200,42 +200,47 @@ void Tiempo_ronda(int ronda, int duracion_ronda, int tiempo_inicio_ronda) {
 }  //Fin de la función
 
 void ControlarTopo(unsigned long inicioRonda, unsigned long finRonda, int frecuenciaMin, int frecuenciaMax) {
-  unsigned long ahora = tiempoDeJuego;
-
-  if (ahora >= inicioRonda && ahora < finRonda) {
-    if (!topoActivo && !esperandoTopo) {
-      unsigned long intervalo = random(frecuenciaMin, frecuenciaMax);
-      proximoTopo = ahora + intervalo;
-      esperandoTopo = true;
+  unsigned long ahora = tiempoDeJuego; // Tomar el tiempo actual del juego
+  
+  // Verificar si estamos dentro del rango de tiempo de la ronda:
+  if (ahora >= inicioRonda && ahora < finRonda) { 
+    // Elegir un momento aleatorio para que el topo aparezca:
+      if (!topoActivo && !esperandoTopo) {
+      unsigned long intervalo = random(frecuenciaMin, frecuenciaMax); // Internvalo aleatorio
+      proximoTopo = ahora + intervalo; // Se guarda en proximoTopo
+      esperandoTopo = true; // Se activa para que no se genere otro tiempo
     }
-
+   // Si llegó el momento, hacer que el topo suba:
     if (!topoActivo && esperandoTopo && ahora >= proximoTopo) {
       topo1.write(90);  // Sube el topo
-      inicioTopo = ahora;
+      inicioTopo = ahora; // Se guarda el tiempo de inicio para saber cuándo bajarlo
       topoActivo = true;
       esperandoTopo = false;
     }
-
+    // Mientras el topo esté activo:
     if (topoActivo) {
       digitalWrite(trig1, LOW);
       delayMicroseconds(2);
-      digitalWrite(trig1, HIGH);
+      digitalWrite(trig1, HIGH); // Se dispara la señal de ultrasonido
       delayMicroseconds(10);
       digitalWrite(trig1, LOW);
 
-      long duracion = pulseIn(echo1, HIGH, 15000);
-      int distancia = duracion / 58;
-
+      long duracion = pulseIn(echo1, HIGH, 15000); // Se mide el tiempo que tarda en volver la señal 
+      int distancia = duracion / 58; // Se transforma a centimetros
+     
+      // Si el jugador lo golpeó a tiempo:
       if (distancia > 0 && distancia < 7) {
-        contador += 2;   // DOBLE puntaje si el sensor detecta el topo
+        contador += 2;   // DOBLE puntaje si el sensor detecta la mano
         topo1.write(0);  // Baja el topo
         topoActivo = false;
-      } else if (ahora - inicioTopo >= duracionTopo) {
-        topo1.write(0);  // Baja el topo igual si se terminó el tiempo
+      } // Si nadie lo golpeó y ya pasó el tiempo:
+        else if (ahora - inicioTopo >= duracionTopo) {
+        topo1.write(0);  // Baja el topo igual a los 3 segundos
         topoActivo = false;
       }
     }
-  } else {
+  } // Si no estamos en el rango de ronda, se asegura que el topo esté abajo:
+    else {
     topo1.write(0);
     topoActivo = false;
     esperandoTopo = false;
@@ -348,25 +353,26 @@ void loop() {                                   //Función principal que se repi
     // Rondas del juego con LEDs y servo
 
     // PRIMERA RONDA sólo LEDS
-    if (tiempoDeJuego < 10000) {
-      Tiempo_ronda(1, 9, 0);
-      Velocidad_reaccion(1000, 3000, 1, 1);
-      // SEGUNDA RONDA LEDS + Topo (uno a la vez)(agregar)
-    } else if (tiempoDeJuego >= 12000 && tiempoDeJuego < 23000) {
-      Tiempo_ronda(2, 10, 12);
-      Velocidad_reaccion(1000, 2000, 1, 2);
+    if (tiempoDeJuego < 10000) { // Dura hasta los 10 segundos desde que empezó el juego
+      Tiempo_ronda(1, 9, 0); // Ronda 1, dura 9 segundos, inicia desde 0
+      Velocidad_reaccion(1000, 3000, 1, 1); // Espera 1 segundo, prende 1 LED por hasta 3 segundos
+    
+    // SEGUNDA RONDA LEDS + Topo (uno a la vez)(agregar)
+    } else if (tiempoDeJuego >= 12000 && tiempoDeJuego < 23000) { // Se activa entre los 12 y 23 segundos del juego
+      Tiempo_ronda(2, 10, 12); // Ronda 2, dura 10 segundos, inicia desde el segundo 12
+      Velocidad_reaccion(1000, 2000, 1, 2); // Prende 1 o 2 LEDs por vez, por menos tiempo (más difícil)
 
-      if (random(1, 3) == 1) {
-        ControlarTopo(12000, 22000, 2000, 4000);  // solo uno de los dos
+      if (random(1, 3) == 1) { // Usa un número aleatorio para activar solo uno de los dos topos en cada ciclo
+        ControlarTopo(12000, 22000, 2000, 4000);  // el primero si random == 1
       } else {
-        ControlarTopo2(12000, 22000, 2000, 4000);
+        ControlarTopo2(12000, 22000, 2000, 4000); // sino el segundo
       }
 
-      // RONDA 3
-    } else if (tiempoDeJuego >= 24000 && tiempoDeJuego < 40000) {
-      Tiempo_ronda(3, 16, 24);
-      Velocidad_reaccion(1000, 1500, 1, 3);
-
+    // RONDA 3 (todo junto aleatorio)
+    } else if (tiempoDeJuego >= 24000 && tiempoDeJuego < 40000) { // Se activa desde los 24 a los 40 segundos
+      Tiempo_ronda(3, 16, 24); // Ronda 3, dura 16 segundos, desde el segundo 24
+      Velocidad_reaccion(1000, 1500, 1, 3); // Prende entre 1 y 3 LEDs con menos tiempo para reaccionar
+      // Cada topo puede aparecer en cualquier momento entre 1 y 2.5 segundos
       ControlarTopo(24000, 39000, 1000, 2500);
       ControlarTopo2(24000, 39000, 1000, 2500);
     }
