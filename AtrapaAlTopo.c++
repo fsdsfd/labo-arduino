@@ -353,8 +353,8 @@ void loop() {                                   //Función principal que se repi
     // Rondas del juego con LEDs y servo
 
     // PRIMERA RONDA sólo LEDS
-    if (tiempoDeJuego < 10000) { // Dura hasta los 10 segundos desde que empezó el juego
-      Tiempo_ronda(1, 9, 0); // Ronda 1, dura 9 segundos, inicia desde 0
+    if (tiempoDeJuego < 11000) { // Dura hasta los 11 segundos desde que empezó el juego
+      Tiempo_ronda(1, 10, 0); // Ronda 1, dura 10 segundos, inicia desde 0
       Velocidad_reaccion(1000, 3000, 1, 1); // Espera 1 segundo, prende 1 LED por hasta 3 segundos
     
     // SEGUNDA RONDA LEDS + Topo (uno a la vez)(agregar)
